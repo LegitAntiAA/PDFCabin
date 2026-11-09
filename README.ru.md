@@ -21,7 +21,7 @@
 ## Быстрый старт
 
 ```bash
-docker run -d -p 8420:8420 -v ./docs:/docs ghcr.io/LegitAntiAA/pdfcabin:latest
+docker run -d -p 8420:8420 -v ./docs:/docs ghcr.io/legitantiaa/pdfcabin:latest
 ```
 
 Откройте `http://localhost:8420` и перетащите PDF-файлы. Всё, что пишет приложение, — ваши файлы и поисковый индекс `index.db` — остаётся в примонтированной папке `./docs`.
@@ -29,7 +29,7 @@ docker run -d -p 8420:8420 -v ./docs:/docs ghcr.io/LegitAntiAA/pdfcabin:latest
 Чтобы защитить инстанс токеном:
 
 ```bash
-docker run -d -p 8420:8420 -v ./docs:/docs -e PDFCABIN_TOKEN=change-me ghcr.io/LegitAntiAA/pdfcabin:latest
+docker run -d -p 8420:8420 -v ./docs:/docs -e PDFCABIN_TOKEN=change-me ghcr.io/legitantiaa/pdfcabin:latest
 ```
 
 Или соберите из исходников:

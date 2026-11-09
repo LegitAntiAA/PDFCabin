@@ -21,7 +21,7 @@ A local document workshop: merge, split, rotate and compress PDFs, run OCR (Russ
 ## Quick start
 
 ```bash
-docker run -d -p 8420:8420 -v ./docs:/docs ghcr.io/LegitAntiAA/pdfcabin:latest
+docker run -d -p 8420:8420 -v ./docs:/docs ghcr.io/legitantiaa/pdfcabin:latest
 ```
 
 Open `http://localhost:8420` and drop some PDFs. Everything the app writes — your files and the search index `index.db` — stays in the `./docs` folder you mounted.
@@ -29,7 +29,7 @@ Open `http://localhost:8420` and drop some PDFs. Everything the app writes — y
 To protect the instance with a token:
 
 ```bash
-docker run -d -p 8420:8420 -v ./docs:/docs -e PDFCABIN_TOKEN=change-me ghcr.io/LegitAntiAA/pdfcabin:latest
+docker run -d -p 8420:8420 -v ./docs:/docs -e PDFCABIN_TOKEN=change-me ghcr.io/legitantiaa/pdfcabin:latest
 ```
 
 Or build from source:

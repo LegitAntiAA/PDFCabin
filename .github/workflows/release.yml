@@ -23,8 +23,9 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Build and push image
+        # Image names must be lowercase: the login may contain capitals.
         run: |
-          IMAGE=ghcr.io/${{ github.repository_owner }}/pdfcabin
-          docker build -t "$IMAGE:latest" -t "$IMAGE:${{ github.ref_name }}" .
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/pdfcabin"
+          docker build -t "$IMAGE:latest" -t "$IMAGE:${GITHUB_REF_NAME}" .
           docker push "$IMAGE:latest"
-          docker push "$IMAGE:${{ github.ref_name }}"
+          docker push "$IMAGE:${GITHUB_REF_NAME}"
