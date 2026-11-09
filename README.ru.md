@@ -157,9 +157,11 @@ claude mcp add --transport http pdfcabin http://localhost:8420/mcp --header "Aut
 | `PDFCABIN_PORT` | `8420` | HTTP-порт |
 | `PDFCABIN_LANGS` | `rus,eng` | Доступные OCR-языки (должны совпадать с установленными языковыми данными tesseract) |
 | `PDFCABIN_MAX_UPLOAD_MB` | `200` | Лимит размера загрузки |
-| `PDFCABIN_DONATE_BTC` | пусто | BTC-адрес для блока донатов (README и веб-интерфейс) |
+| `PDFCABIN_DONATE_BTC` | адрес автора | BTC-адрес для блока донатов (веб-интерфейс и README) |
+| `PDFCABIN_DONATE_ETH` | адрес автора | ETH (ERC-20) адрес |
 | `PDFCABIN_DONATE_TON` | пусто | TON-адрес |
-| `PDFCABIN_DONATE_USDT` | пусто | USDT TRC-20 адрес |
+| `PDFCABIN_DONATE_USDT_BEP20` | адрес автора | USDT (BEP-20) адрес |
+| `PDFCABIN_DONATE_USDT_TRC20` | адрес автора | USDT (TRC-20) адрес |
 
 ## Скриншоты
 
@@ -210,11 +212,12 @@ PDFCabin бесплатен и останется бесплатным. Если
 
 | Сеть | Адрес |
 |---|---|
-| BTC (bc1) | `<ЗАПОЛНИТЬ>` |
-| TON | `<ЗАПОЛНИТЬ>` |
-| USDT TRC-20 | `<ЗАПОЛНИТЬ>` |
+| BTC | `183Ux9K4eNC8qxgULSN5eFcnvEiJGdzTBX` |
+| ETH (ERC-20) | `0xb8ec96ef15f6dc79f854c277c71acf6dc581f1ee` |
+| USDT (BEP-20) | `0x34aa51a6352c18cc5aacb4ef70ee8f5d968d1c4a` |
+| USDT (TRC-20) | `TB8PSJu9SKncq2x7bsrqDS1sJTLWqoXCZA` |
 
-Делаете форк? Впишите свои адреса в переменные окружения `PDFCABIN_DONATE_BTC` / `PDFCABIN_DONATE_TON` / `PDFCABIN_DONATE_USDT` — и ваша сборка получит собственный блок донатов (в README и в веб-интерфейсе через `GET /api/donate`).
+Эти адреса также вшиты в само приложение: любой запуск — локальный или Docker — показывает их за кнопкой ♥ в интерфейсе. Делаете форк? Задайте свои адреса через переменные окружения `PDFCABIN_DONATE_*` (или отредактируйте `app/config.py`) — и ваша сборка получит собственный блок донатов (в README и в веб-интерфейсе через `GET /api/donate`).
 
 ## Лицензия
 

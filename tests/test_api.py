@@ -248,12 +248,21 @@ async def test_stats_and_donate(client, make_pdf, monkeypatch):
     stats = (await client.get("/api/stats")).json()
     assert {"files", "pages", "index_ok"} <= set(stats)
 
+    # owner's addresses are baked in as defaults; env/monkeypatch overrides them
+    for field in (
+        "donate_btc", "donate_eth", "donate_ton", "donate_usdt_bep20", "donate_usdt_trc20"
+    ):
+        monkeypatch.setattr(config.settings, field, "")
     empty = (await client.get("/api/donate")).json()
     assert empty == {"addresses": []}
 
     monkeypatch.setattr(config.settings, "donate_btc", "bc1qtest")
+    monkeypatch.setattr(config.settings, "donate_usdt_trc20", "TQtest")
     donate = (await client.get("/api/donate")).json()
-    assert donate["addresses"] == [{"network": "BTC", "address": "bc1qtest"}]
+    assert donate["addresses"] == [
+        {"network": "BTC", "address": "bc1qtest"},
+        {"network": "USDT (TRC-20)", "address": "TQtest"},
+    ]
 
 
 async def test_root_serves_static(client):

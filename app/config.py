@@ -18,9 +18,16 @@ class Settings(BaseSettings):
     port: int = 8420
     langs: str = "rus,eng"
     max_upload_mb: int = 200
-    donate_btc: str = ""
+    # Donation addresses: the project author's wallets are baked in as defaults
+    # (owner's decision — every install, local or Docker, shows the donate heart
+    # out of the box). Any PDFCABIN_DONATE_* env var overrides the corresponding
+    # default, which keeps the "a fork collects donations for its own build"
+    # pattern working without touching the code.
+    donate_btc: str = "183Ux9K4eNC8qxgULSN5eFcnvEiJGdzTBX"
+    donate_eth: str = "0xb8ec96ef15f6dc79f854c277c71acf6dc581f1ee"
     donate_ton: str = ""
-    donate_usdt: str = ""
+    donate_usdt_bep20: str = "0x34aa51a6352c18cc5aacb4ef70ee8f5d968d1c4a"
+    donate_usdt_trc20: str = "TB8PSJu9SKncq2x7bsrqDS1sJTLWqoXCZA"
 
     @property
     def lang_list(self) -> list[str]:
@@ -31,8 +38,10 @@ class Settings(BaseSettings):
         addresses = []
         for network, address in (
             ("BTC", self.donate_btc),
+            ("ETH (ERC-20)", self.donate_eth),
             ("TON", self.donate_ton),
-            ("USDT TRC-20", self.donate_usdt),
+            ("USDT (BEP-20)", self.donate_usdt_bep20),
+            ("USDT (TRC-20)", self.donate_usdt_trc20),
         ):
             if address.strip():
                 addresses.append({"network": network, "address": address.strip()})

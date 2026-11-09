@@ -19,9 +19,12 @@ services:
     #   # a token is REQUIRED. Use a long random string. See the security note
     #   # in the README (Quick start section).
     #   PDFCABIN_TOKEN: "change-me-to-a-long-random-string"
-    #   # Crypto addresses for the donate modal in the UI (served by GET /api/donate).
-    #   # The donate icon appears in the UI only when at least one address is set.
-    #   # Forks: put your own addresses here to collect donations for your build.
+    #   # Donation addresses: the project author's wallets are already baked in as
+    #   # app defaults, so the donate heart shows up out of the box. Forks: set
+    #   # YOUR addresses here (env overrides the defaults) to collect donations
+    #   # for your build.
     #   PDFCABIN_DONATE_BTC: ""
+    #   PDFCABIN_DONATE_ETH: ""
     #   PDFCABIN_DONATE_TON: ""
-    #   PDFCABIN_DONATE_USDT: ""
+    #   PDFCABIN_DONATE_USDT_BEP20: ""
+    #   PDFCABIN_DONATE_USDT_TRC20: ""
