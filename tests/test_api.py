@@ -34,13 +34,19 @@ async def test_token_required_on_mcp(client, monkeypatch):
 
 
 async def test_path_traversal_blocked(client):
-    for evil in ("../x.pdf", "a/../../x.pdf", "C:/Windows/win.ini", ""):
+    for evil in ("../x.pdf", "a/../../x.pdf"):
         response = await client.get("/api/file/info", params={"path": evil})
-        assert response.status_code in (400, 422), evil
+        assert response.status_code == 400, evil
         assert "detail" in response.json()
     # pre-encoded traversal that never touches params re-encoding
     raw = await client.get("/api/file/info?path=..%2Fx.pdf")
     assert raw.status_code == 400
+    # a Windows absolute path: rejected on Windows (it would resolve outside
+    # docs_dir); on POSIX it is just a nonexistent in-sandbox name -> 404
+    winpath = await client.get("/api/file/info", params={"path": "C:/Windows/win.ini"})
+    assert winpath.status_code in (400, 404)
+    empty = await client.get("/api/file/info", params={"path": ""})
+    assert empty.status_code in (400, 422)
 
 
 async def test_upload_and_list(client, no_network):
