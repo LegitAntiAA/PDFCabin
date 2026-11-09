@@ -5,10 +5,10 @@
 
 English · [Русский](README.ru.md)
 
-[![CI](https://github.com/OWNER/pdfcabin/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/pdfcabin/actions/workflows/ci.yml)
-[![Docker Image](https://img.shields.io/badge/image-ghcr.io%2FOWNER%2Fpdfcabin-2496ED?logo=docker&logoColor=white)](https://github.com/OWNER/pdfcabin/pkgs/container/pdfcabin)
+[![CI](https://github.com/LegitAntiAA/pdfcabin/actions/workflows/ci.yml/badge.svg)](https://github.com/LegitAntiAA/pdfcabin/actions/workflows/ci.yml)
+[![Docker Image](https://img.shields.io/badge/image-ghcr.io%2FLegitAntiAA%2Fpdfcabin-2496ED?logo=docker&logoColor=white)](https://github.com/LegitAntiAA/pdfcabin/pkgs/container/pdfcabin)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/OWNER/pdfcabin/pulls)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/LegitAntiAA/pdfcabin/pulls)
 
 A local document workshop: merge, split, rotate and compress PDFs, run OCR (Russian + English) on your scans, then full-text search across everything — through a web UI or directly from Claude or any other MCP-capable AI agent. One Docker container, one port (**8420**), zero outbound requests, no telemetry.
 
@@ -21,7 +21,7 @@ A local document workshop: merge, split, rotate and compress PDFs, run OCR (Russ
 ## Quick start
 
 ```bash
-docker run -d -p 8420:8420 -v ./docs:/docs ghcr.io/OWNER/pdfcabin:latest
+docker run -d -p 8420:8420 -v ./docs:/docs ghcr.io/LegitAntiAA/pdfcabin:latest
 ```
 
 Open `http://localhost:8420` and drop some PDFs. Everything the app writes — your files and the search index `index.db` — stays in the `./docs` folder you mounted.
@@ -29,13 +29,13 @@ Open `http://localhost:8420` and drop some PDFs. Everything the app writes — y
 To protect the instance with a token:
 
 ```bash
-docker run -d -p 8420:8420 -v ./docs:/docs -e PDFCABIN_TOKEN=change-me ghcr.io/OWNER/pdfcabin:latest
+docker run -d -p 8420:8420 -v ./docs:/docs -e PDFCABIN_TOKEN=change-me ghcr.io/LegitAntiAA/pdfcabin:latest
 ```
 
 Or build from source:
 
 ```bash
-git clone https://github.com/OWNER/pdfcabin.git
+git clone https://github.com/LegitAntiAA/pdfcabin.git
 cd pdfcabin
 docker compose up --build
 ```
@@ -164,10 +164,6 @@ Any other MCP client speaks the same JSON shape — point it at `http://localhos
 | `PDFCABIN_PORT` | `8420` | HTTP port |
 | `PDFCABIN_LANGS` | `rus,eng` | Available OCR languages (must match the installed tesseract language data) |
 | `PDFCABIN_MAX_UPLOAD_MB` | `200` | Upload size limit |
-| `PDFCABIN_DONATE_BTC` | author's BTC address | BTC address for the donate block (web UI and README) |
-| `PDFCABIN_DONATE_ETH` | author's ETH address | Ethereum address (receives ETH and USDT ERC-20) |
-| `PDFCABIN_DONATE_TON` | author's TON address | TON address |
-| `PDFCABIN_DONATE_USDT_TRC20` | author's address | USDT (TRC-20) address |
 
 ## Screenshots
 
@@ -182,8 +178,6 @@ Any other MCP client speaks the same JSON shape — point it at `http://localhos
 ![Light theme](screenshots/ui-light.png)
 
 ![Mobile layout at 380px](screenshots/ui-mobile.png)
-
-<!-- TODO: screenshots/mcp-demo.gif — upload → OCR → search from Claude via MCP -->
 
 ## Development
 
@@ -223,8 +217,6 @@ PDFCabin is free and will stay free. If it saves you time, you can support the p
 | USDT (ERC-20) | `0x9a3e38ffa8d0002e8423a101b98ef214a574abde` |
 | USDT (TRC-20) | `TNGrTqLZZdf99zTQoSABvXmAzPTh7NfESk` |
 | TON | `UQBwZJojKzuIFCpf4V_RSVCSub4J96IWulnfeJ-hYRviB3nw` |
-
-These addresses are also baked into the app itself, so every install — local or Docker — shows them behind the ♥ button in the UI. Forking PDFCabin? Set your own addresses via the `PDFCABIN_DONATE_*` environment variables (or edit `app/config.py`) — your build gets its own donate block (in the README and in the web UI via `GET /api/donate`).
 
 ## License
 

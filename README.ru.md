@@ -5,10 +5,10 @@
 
 [English](README.md) · Русский
 
-[![CI](https://github.com/OWNER/pdfcabin/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/pdfcabin/actions/workflows/ci.yml)
-[![Docker Image](https://img.shields.io/badge/image-ghcr.io%2FOWNER%2Fpdfcabin-2496ED?logo=docker&logoColor=white)](https://github.com/OWNER/pdfcabin/pkgs/container/pdfcabin)
+[![CI](https://github.com/LegitAntiAA/pdfcabin/actions/workflows/ci.yml/badge.svg)](https://github.com/LegitAntiAA/pdfcabin/actions/workflows/ci.yml)
+[![Docker Image](https://img.shields.io/badge/image-ghcr.io%2FLegitAntiAA%2Fpdfcabin-2496ED?logo=docker&logoColor=white)](https://github.com/LegitAntiAA/pdfcabin/pkgs/container/pdfcabin)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/OWNER/pdfcabin/pulls)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/LegitAntiAA/pdfcabin/pulls)
 
 Локальная «мастерская документов»: склейка, разбивка, поворот и сжатие PDF, OCR (русский + английский) для сканов и полнотекстовый поиск по всему этому — через веб-интерфейс или напрямую из Claude и любого другого AI-агента с поддержкой MCP. Один Docker-контейнер, один порт (**8420**), ноль исходящих запросов, никакой телеметрии.
 
@@ -21,7 +21,7 @@
 ## Быстрый старт
 
 ```bash
-docker run -d -p 8420:8420 -v ./docs:/docs ghcr.io/OWNER/pdfcabin:latest
+docker run -d -p 8420:8420 -v ./docs:/docs ghcr.io/LegitAntiAA/pdfcabin:latest
 ```
 
 Откройте `http://localhost:8420` и перетащите PDF-файлы. Всё, что пишет приложение, — ваши файлы и поисковый индекс `index.db` — остаётся в примонтированной папке `./docs`.
@@ -29,13 +29,13 @@ docker run -d -p 8420:8420 -v ./docs:/docs ghcr.io/OWNER/pdfcabin:latest
 Чтобы защитить инстанс токеном:
 
 ```bash
-docker run -d -p 8420:8420 -v ./docs:/docs -e PDFCABIN_TOKEN=change-me ghcr.io/OWNER/pdfcabin:latest
+docker run -d -p 8420:8420 -v ./docs:/docs -e PDFCABIN_TOKEN=change-me ghcr.io/LegitAntiAA/pdfcabin:latest
 ```
 
 Или соберите из исходников:
 
 ```bash
-git clone https://github.com/OWNER/pdfcabin.git
+git clone https://github.com/LegitAntiAA/pdfcabin.git
 cd pdfcabin
 docker compose up --build
 ```
@@ -164,10 +164,6 @@ claude mcp add --transport http pdfcabin http://localhost:8420/mcp --header "Aut
 | `PDFCABIN_PORT` | `8420` | HTTP-порт |
 | `PDFCABIN_LANGS` | `rus,eng` | Доступные OCR-языки (должны совпадать с установленными языковыми данными tesseract) |
 | `PDFCABIN_MAX_UPLOAD_MB` | `200` | Лимит размера загрузки |
-| `PDFCABIN_DONATE_BTC` | адрес автора | BTC-адрес для блока донатов (веб-интерфейс и README) |
-| `PDFCABIN_DONATE_ETH` | адрес автора | Ethereum-адрес (принимает ETH и USDT ERC-20) |
-| `PDFCABIN_DONATE_TON` | адрес автора | TON-адрес |
-| `PDFCABIN_DONATE_USDT_TRC20` | адрес автора | USDT (TRC-20) адрес |
 
 ## Скриншоты
 
@@ -223,8 +219,6 @@ PDFCabin бесплатен и останется бесплатным. Если
 | USDT (ERC-20) | `0x9a3e38ffa8d0002e8423a101b98ef214a574abde` |
 | USDT (TRC-20) | `TNGrTqLZZdf99zTQoSABvXmAzPTh7NfESk` |
 | TON | `UQBwZJojKzuIFCpf4V_RSVCSub4J96IWulnfeJ-hYRviB3nw` |
-
-Эти адреса также вшиты в само приложение: любой запуск — локальный или Docker — показывает их за кнопкой ♥ в интерфейсе. Делаете форк? Задайте свои адреса через переменные окружения `PDFCABIN_DONATE_*` (или отредактируйте `app/config.py`) — и ваша сборка получит собственный блок донатов (в README и в веб-интерфейсе через `GET /api/donate`).
 
 ## Лицензия
 
