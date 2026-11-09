@@ -10,9 +10,10 @@ Start the server first (uvicorn app.main:app), then:
 What it does: checks /api/health, uploads two small generated PDFs via
 POST /api/upload, then drives the MCP tools through fastmcp's streamable-HTTP
 client (list_documents, pdf_info, pdf_merge, pdf_split, pdf_compress fast,
-extract_text, search_documents; pdf_ocr with --with-ocr). Every file created
-along the way is removed via DELETE /api/file, so the user's library keeps
-only what lands in docs_dir/trash — the same place the UI "Delete" uses.
+extract_text, search_documents, create_document, save_document,
+delete_document; pdf_ocr with --with-ocr). Every file created along the way
+is removed via DELETE /api/file or delete_document, so the user's library
+keeps only what lands in docs_dir/trash — the same place the UI "Delete" uses.
 
 Prints one OK/FAIL line per step and finishes with "E2E PASS" (exit 0) or the
 list of failed steps with their exceptions (exit 1).
@@ -23,7 +24,10 @@ from __future__ import annotations
 import argparse
 import asyncio
 import io
+import os
+import shutil
 import sys
+import tempfile
 
 import httpx
 
@@ -254,6 +258,56 @@ async def _mcp_steps(args, base_url: str, headers: dict, created: list, report: 
                 report.ok(name, _one_line(found))
         except Exception as exc:
             report.fail(name, exc)
+
+        # create_document -> save_document -> delete_document -----------------
+        temp_dir = tempfile.mkdtemp(prefix="pdfcabin-e2e-")
+        try:
+            name = "mcp: create_document(text->pdf)"
+            report.step()
+            try:
+                answer = _tool_text(
+                    await mcp.call_tool(
+                        "create_document",
+                        {"text": f"PDFCabin e2e created document with {_SEARCH_WORD}",
+                         "name": "e2e_created.pdf", "overwrite": True},
+                    )
+                )
+                if "Created e2e_created.pdf" not in answer:
+                    raise AssertionError(f"unexpected answer: {_one_line(answer)}")
+                report.ok(name, _one_line(answer))
+            except Exception as exc:
+                report.fail(name, exc)
+
+            name = "mcp: save_document(to os path)"
+            report.step()
+            try:
+                save_target = os.path.join(temp_dir, "e2e_saved.pdf")
+                saved = _tool_text(
+                    await mcp.call_tool(
+                        "save_document",
+                        {"path": "e2e_created.pdf", "target_path": save_target},
+                    )
+                )
+                with open(save_target, "rb") as fh:
+                    if fh.read(5) != b"%PDF-":
+                        raise AssertionError("saved file is not a PDF")
+                report.ok(name, _one_line(saved))
+            except Exception as exc:
+                report.fail(name, exc)
+
+            name = "mcp: delete_document(to trash)"
+            report.step()
+            try:
+                trashed = _tool_text(
+                    await mcp.call_tool("delete_document", {"path": "e2e_created.pdf"})
+                )
+                if not trashed.startswith("trash/e2e_created.pdf"):
+                    raise AssertionError(f"unexpected answer: {_one_line(trashed)}")
+                report.ok(name, _one_line(trashed))
+            except Exception as exc:
+                report.fail(name, exc)
+        finally:
+            shutil.rmtree(temp_dir, ignore_errors=True)
 
         # pdf_ocr + indexed search (optional) --------------------------------
         if args.with_ocr:

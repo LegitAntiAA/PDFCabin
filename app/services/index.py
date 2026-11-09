@@ -89,6 +89,13 @@ def remove_from_index(rel_path: str) -> None:
         conn.execute("DELETE FROM pages_fts WHERE path = ?", (rel_path,))
 
 
+def rename_in_index(old_rel: str, new_rel: str) -> None:
+    """Point indexed rows at a renamed file (no-op when nothing is indexed)."""
+    with _conn() as conn:
+        conn.execute("UPDATE pages SET path = ? WHERE path = ?", (new_rel, old_rel))
+        conn.execute("UPDATE pages_fts SET path = ? WHERE path = ?", (new_rel, old_rel))
+
+
 def has_text(rel_path: str) -> bool:
     with _conn() as conn:
         row = conn.execute(

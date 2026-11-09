@@ -16,7 +16,7 @@ A local document workshop: merge, split, rotate and compress PDFs, run OCR (Russ
 
 - **Nothing leaves your machine.** All processing runs locally in a single container. No cloud calls, no analytics, no telemetry — even the web UI ships without a single external URL (no CDN, system fonts only).
 - **Russian + English OCR out of the box.** Built on Tesseract and OCRmyPDF: scanned PDFs get a searchable text layer, and everything recognized becomes full-text searchable.
-- **Your AI agents get tools.** A built-in MCP server (streamable HTTP) exposes 8 focused tools — Claude, or any MCP client, can merge, compress, OCR, read and search your documents without a single file leaving your server.
+- **Your AI agents get tools.** A built-in MCP server (streamable HTTP) exposes 15 focused tools — Claude, or any MCP client, can import, create, merge, compress, OCR, read, rename and search your documents without a single file leaving your server.
 
 ## Quick start
 
@@ -77,8 +77,15 @@ Honest note on search: it matches **exact word forms** (SQLite FTS5, `unicode61`
 |---|---|
 | `list_documents()` | What's in the library, with page counts |
 | `pdf_info(path)` | Pages, size, encrypted, has text layer |
+| `upload_document(source_path, name=None, overwrite=False)` | Import a PDF from a local path on this machine into the library |
+| `create_document(text, name="document.pdf", overwrite=False)` | Make a new PDF from plain text (unicode-safe) |
+| `save_document(path, target_path, overwrite=False)` | Save a library PDF to any local path on this machine |
+| `delete_document(path)` | Move a PDF to the library trash (same as UI Delete) |
+| `rename_document(path, new_name, overwrite=False)` | Rename a PDF; the search index follows automatically |
 | `pdf_merge(paths, output)` | Merge PDFs in the given order |
 | `pdf_split(path, mode, value)` | Split by ranges or every N pages |
+| `pdf_rotate(path, pages, angle, output, overwrite=False)` | Rotate pages 90/180/270 into a new file |
+| `pdf_delete_pages(path, pages, output, overwrite=False)` | Drop pages into a new file |
 | `pdf_compress(path, output, level="fast")` | Compress; reports the savings in percent |
 | `pdf_ocr(path, languages="rus+eng", force=False)` | OCR — blocks until the background queue finishes, then indexes the result |
 | `extract_text(path, pages=None)` | "Read me this PDF" |
@@ -200,7 +207,7 @@ ruff check .          # lint
 
 ## Roadmap
 
-- **v0.1 (this scope):** merge / split / rotate / delete pages / compress / OCR (rus+eng) / full-text search / 8 MCP tools / web UI / Docker.
+- **v0.1 (this scope):** merge / split / rotate / delete pages / compress / OCR (rus+eng) / full-text search / 15 MCP tools / web UI / Docker.
 - **v0.2:** watermark, password protect/unlock, DOCX→PDF (optional, as a separate image), drag-and-drop page reordering in the UI, a redo-OCR button, more OCR languages.
 - **v0.3:** watch-folder (auto-OCR of new files), webhooks, read-only REST keys, export to Paperless-ngx.
 - **v1.0:** search with stemming (Russian), PWA.

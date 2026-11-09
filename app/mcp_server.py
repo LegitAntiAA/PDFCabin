@@ -1,4 +1,4 @@
-"""FastMCP server: 8 tools — one facade over app.services (the same functions REST uses).
+"""FastMCP server: 15 tools — one facade over app.services (the same functions REST uses).
 
 Principles (spec 6.7): few but smart tools, meaningful docstrings (the agent reads
 them to pick a tool), compact answers, library-relative paths.
@@ -12,7 +12,7 @@ from pathlib import Path
 from fastmcp import FastMCP
 
 from . import config
-from .services import index, jobs, ocr, pdf_ops
+from .services import index, jobs, library, ocr, pdf_ops
 
 mcp = FastMCP("PDFCabin")
 
@@ -170,3 +170,86 @@ def search_documents(query: str, limit: int = 20) -> str:
             "or the file may simply not contain the word."
         )
     return "\n\n".join(f"{item['path']} p.{item['page']}: {item['snippet']}" for item in results)
+
+
+# ------------------------------------------------------------- documents in/out
+
+
+@mcp.tool
+def upload_document(source_path: str, name: str | None = None, overwrite: bool = False) -> str:
+    r"""Import a PDF from a local OS path on the same machine as the server.
+
+    source_path is an absolute filesystem path the server can read, e.g.
+    "C:\Users\me\Downloads\report.pdf" or "/home/me/report.pdf"; the file must
+    be a real PDF and within the size limit. name defaults to the source file
+    name. Returns "Saved <path> (N bytes)".
+    """
+    target, rel = library.import_from_os_path(source_path, name, overwrite)
+    return f"Saved {rel} ({target.stat().st_size} bytes)"
+
+
+@mcp.tool
+def create_document(text: str, name: str = "document.pdf", overwrite: bool = False) -> str:
+    """Create a new PDF from plain text.
+
+    Unicode text is supported (Cyrillic included, when the server has a
+    suitable system font); lines are wrapped and paginated onto A4 pages
+    with 72pt margins. Returns "Created <path> (N pages)".
+    """
+    clean = library.sanitize_name(name)
+    target = config.docs_dir() / clean
+    if target.exists() and not overwrite:
+        raise FileExistsError(f"'{clean}' already exists (pass overwrite=true)")
+    pages = library.create_pdf_from_text(text, target)
+    return f"Created {config.rel_from_docs(target)} ({pages} pages)"
+
+
+@mcp.tool
+def save_document(path: str, target_path: str, overwrite: bool = False) -> str:
+    """Save a library PDF to any local path on this computer.
+
+    target_path is an OS path; missing parent folders are created. Existing
+    files are only replaced with overwrite=true. Returns the destination
+    path and size.
+    """
+    destination = library.export_to_os_path(path, target_path, overwrite)
+    return f"Saved to {destination} ({destination.stat().st_size} bytes)"
+
+
+@mcp.tool
+def delete_document(path: str) -> str:
+    """Move a PDF into the library trash (docs_dir/trash/...) — the same place
+    the web UI "Delete" uses. The file disappears from listings and search.
+    Returns the trash path it was moved to.
+    """
+    return library.move_to_trash(path)
+
+
+@mcp.tool
+def rename_document(path: str, new_name: str, overwrite: bool = False) -> str:
+    """Rename a PDF (it stays in its folder).
+
+    The search index is updated automatically, so existing hits keep working
+    under the new name. Returns the new library-relative path.
+    """
+    return config.rel_from_docs(library.rename_document(path, new_name, overwrite))
+
+
+@mcp.tool
+def pdf_rotate(path: str, pages: str, angle: int, output: str, overwrite: bool = False) -> str:
+    """Rotate pages by 90, 180 or 270 degrees, saved as a new file.
+
+    pages: 1-based spec like "1-3,5". angle: 90, 180 or 270.
+    """
+    result = pdf_ops.pdf_rotate(_path(path), pages, angle, _path(output), overwrite)
+    return f"Created {config.rel_from_docs(result)} ({pdf_ops.page_count(result)} pages)."
+
+
+@mcp.tool
+def pdf_delete_pages(path: str, pages: str, output: str, overwrite: bool = False) -> str:
+    """Delete pages from a PDF, saved as a new file.
+
+    pages: 1-based spec like "2,4" or "1-3" (deleting every page is rejected).
+    """
+    result = pdf_ops.pdf_delete_pages(_path(path), pages, _path(output), overwrite)
+    return f"Created {config.rel_from_docs(result)} ({pdf_ops.page_count(result)} pages)."

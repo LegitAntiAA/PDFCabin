@@ -18,6 +18,7 @@ dependencies = [
     "pypdfium2>=4",
     "python-multipart>=0.0.9",
     "pydantic-settings>=2",
+    "reportlab>=4",
 ]
 
 [project.optional-dependencies]

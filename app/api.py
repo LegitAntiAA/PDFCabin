@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import io
 import os
-import re
 from pathlib import Path
 
 import pypdfium2 as pdfium
@@ -17,11 +16,10 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel
 
 from . import APP_VERSION, config, deps
-from .services import index, jobs, ocr, pdf_ops
+from .services import index, jobs, library, ocr, pdf_ops
 
 router = APIRouter(prefix="/api", dependencies=[Depends(deps.require_token)])
 
-_BAD_NAME = re.compile(r'[\\/:*?"<>|\x00-\x1f]+')
 _THUMB_WIDTH = 240
 
 
@@ -33,17 +31,6 @@ def _existing(rel: str):
     if not path.is_file():
         raise HTTPException(status_code=404, detail="file not found")
     return path
-
-
-def _sanitize_name(name: str) -> str:
-    """Keep unicode letters, drop path separators and control characters."""
-    name = os.path.basename(name.replace("\\", "/")).strip()
-    name = _BAD_NAME.sub("_", name).strip().lstrip(".")
-    if not name:
-        name = "document.pdf"
-    if not name.lower().endswith(".pdf"):
-        name += ".pdf"
-    return name
 
 
 async def _read_limited(upload: UploadFile, limit: int) -> bytes:
@@ -127,21 +114,11 @@ def list_files(subdir: str = ""):
 
 @router.post("/upload")
 async def upload(files: list[UploadFile] = File(...), overwrite: bool = False):
-    limit = config.settings.max_upload_mb * 1024 * 1024
+    limit = library.upload_limit_bytes()
     saved = []
     for upload_file in files:
         data = await _read_limited(upload_file, limit)
-        if data[:5] != pdf_ops.PDF_MAGIC:
-            raise HTTPException(
-                status_code=400, detail=f"'{upload_file.filename}' is not a PDF file"
-            )
-        name = _sanitize_name(upload_file.filename or "")
-        target = config.docs_dir() / name
-        if target.exists() and not overwrite:
-            raise HTTPException(
-                status_code=409, detail=f"'{name}' already exists (pass overwrite=true)"
-            )
-        target.write_bytes(data)
+        _target, name = library.save_pdf(data, upload_file.filename or "", overwrite)
         saved.append({"path": name, "size": len(data)})
     return {"saved": saved}
 
@@ -185,18 +162,7 @@ def download(path: str):
 @router.delete("/file")
 def delete_file(path: str):
     """Move a PDF into docs_dir/trash/ (UI "Delete") and drop it from the index."""
-    target = _existing(path)
-    rel = config.rel_from_docs(target)
-    trash = config.docs_dir() / "trash"
-    destination = trash / rel
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    counter = 1
-    while destination.exists():
-        destination = trash / f"{target.stem}_{counter}{target.suffix}"
-        counter += 1
-    target.rename(destination)
-    index.remove_from_index(rel)
-    return {"trash": config.rel_from_docs(destination)}
+    return {"trash": library.move_to_trash(path)}
 
 
 # ---------------------------------------------------------------- operations

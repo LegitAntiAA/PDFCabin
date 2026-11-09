@@ -2,32 +2,16 @@
 
 from __future__ import annotations
 
-import glob
 from pathlib import Path
 
 import pytest
 
 from app import config
+from app.services.library import find_unicode_font
 
-# A TTF with Cyrillic coverage for reportlab. DejaVuSans.ttf is not committed
-# to the repo (spec 9); fall back to a system font, then to latin-only Helvetica.
-_FONT_CANDIDATES = (
-    r"C:\Windows\Fonts\DejaVuSans.ttf",
-    r"C:\Windows\Fonts\calibri.ttf",
-    r"C:\Windows\Fonts\arial.ttf",
-    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-    "/usr/share/fonts/**/DejaVuSans.ttf",
-)
-
-
-def find_unicode_font() -> str | None:
-    for candidate in _FONT_CANDIDATES:
-        matches = glob.glob(candidate, recursive=True)
-        if matches:
-            return matches[0]
-    return None
-
-
+# A TTF with Cyrillic coverage for reportlab, discovered by the app itself
+# (DejaVuSans.ttf is not committed to the repo, spec 9); None -> latin-only
+# Helvetica fixtures.
 UNICODE_FONT = find_unicode_font()
 
 
