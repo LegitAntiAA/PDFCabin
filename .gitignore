@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# User documents and the search index live here (docs sandbox),
+# but the agent tracking docs are part of the repository
+docs/*
+!docs/agent/
+*.db
+
+# Local artifacts
+screenshots/*.png
+screenshots/*.gif

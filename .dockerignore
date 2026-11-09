@@ -1,0 +1,17 @@
+# VCS and CI (never needed inside the image)
+.git
+.github
+
+# Local dev environments and caches
+.venv
+.pytest_cache
+.ruff_cache
+*.egg-info
+**/__pycache__
+**/*.pyc
+
+# User documents, search index and test artifacts stay out of the image
+docs/
+tests/
+screenshots/
+**/*.db
