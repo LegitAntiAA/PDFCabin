@@ -158,9 +158,8 @@ Any other MCP client speaks the same JSON shape — point it at `http://localhos
 | `PDFCABIN_LANGS` | `rus,eng` | Available OCR languages (must match the installed tesseract language data) |
 | `PDFCABIN_MAX_UPLOAD_MB` | `200` | Upload size limit |
 | `PDFCABIN_DONATE_BTC` | author's BTC address | BTC address for the donate block (web UI and README) |
-| `PDFCABIN_DONATE_ETH` | author's ETH address | ETH (ERC-20) address |
-| `PDFCABIN_DONATE_TON` | empty | TON address |
-| `PDFCABIN_DONATE_USDT_BEP20` | author's address | USDT (BEP-20) address |
+| `PDFCABIN_DONATE_ETH` | author's ETH address | Ethereum address (receives ETH and USDT ERC-20) |
+| `PDFCABIN_DONATE_TON` | author's TON address | TON address |
 | `PDFCABIN_DONATE_USDT_TRC20` | author's address | USDT (TRC-20) address |
 
 ## Screenshots
@@ -212,10 +211,11 @@ PDFCabin is free and will stay free. If it saves you time, you can support the p
 
 | Network | Address |
 |---|---|
-| BTC | `183Ux9K4eNC8qxgULSN5eFcnvEiJGdzTBX` |
-| ETH (ERC-20) | `0xb8ec96ef15f6dc79f854c277c71acf6dc581f1ee` |
-| USDT (BEP-20) | `0x34aa51a6352c18cc5aacb4ef70ee8f5d968d1c4a` |
-| USDT (TRC-20) | `TB8PSJu9SKncq2x7bsrqDS1sJTLWqoXCZA` |
+| BTC | `bc1qw4my95y7uhmg7up7w762qfju04l6960plpkp0u` |
+| Ethereum (ETH) | `0x9a3e38ffa8d0002e8423a101b98ef214a574abde` |
+| USDT (ERC-20) | `0x9a3e38ffa8d0002e8423a101b98ef214a574abde` |
+| USDT (TRC-20) | `TNGrTqLZZdf99zTQoSABvXmAzPTh7NfESk` |
+| TON | `UQBwZJojKzuIFCpf4V_RSVCSub4J96IWulnfeJ-hYRviB3nw` |
 
 These addresses are also baked into the app itself, so every install — local or Docker — shows them behind the ♥ button in the UI. Forking PDFCabin? Set your own addresses via the `PDFCABIN_DONATE_*` environment variables (or edit `app/config.py`) — your build gets its own donate block (in the README and in the web UI via `GET /api/donate`).
 

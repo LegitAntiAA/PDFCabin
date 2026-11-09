@@ -249,9 +249,7 @@ async def test_stats_and_donate(client, make_pdf, monkeypatch):
     assert {"files", "pages", "index_ok"} <= set(stats)
 
     # owner's addresses are baked in as defaults; env/monkeypatch overrides them
-    for field in (
-        "donate_btc", "donate_eth", "donate_ton", "donate_usdt_bep20", "donate_usdt_trc20"
-    ):
+    for field in ("donate_btc", "donate_eth", "donate_ton", "donate_usdt_trc20"):
         monkeypatch.setattr(config.settings, field, "")
     empty = (await client.get("/api/donate")).json()
     assert empty == {"addresses": []}

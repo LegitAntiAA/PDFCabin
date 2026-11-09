@@ -26,5 +26,4 @@ services:
     #   PDFCABIN_DONATE_BTC: ""
     #   PDFCABIN_DONATE_ETH: ""
     #   PDFCABIN_DONATE_TON: ""
-    #   PDFCABIN_DONATE_USDT_BEP20: ""
     #   PDFCABIN_DONATE_USDT_TRC20: ""

@@ -116,7 +116,7 @@ const API_BASE = location.protocol.startsWith("http")
 | `GET /api/jobs/{id}` | — | джоба или `404`, структура ниже |
 | `GET /api/search` | `?q=…&limit=20` (1..100) | `[{"path":"scan_ocr.pdf","page":1,"snippet":"…<mark>слово</mark>…"}]` |
 | `GET /api/stats` | — | `{"files":1,"pages":3,"index_ok":true}` |
-| `GET /api/donate` | — | `{"addresses":[{"network":"BTC","address":"…"}]}`; подписи сетей приходят из конфига автора (сейчас: `BTC`, `ETH (ERC-20)`, `USDT (BEP-20)`, `USDT (TRC-20)`); адреса вшиты по умолчанию, пусто → `{"addresses":[]}` |
+| `GET /api/donate` | — | `{"addresses":[{"network":"BTC","address":"…"}]}`; подписи сетей приходят из конфига автора (сейчас: `BTC`, `Ethereum (ETH)`, `USDT (ERC-20)`, `TON`, `USDT (TRC-20)`; Ethereum-адрес один для ETH и USDT ERC-20 — две строки); адреса вшиты по умолчанию, пусто → `{"addresses":[]}` |
 
 Синтаксис `pages` везде один: `1-3,5,8-` (1-базовый, включительно, `8-` = до конца).
 

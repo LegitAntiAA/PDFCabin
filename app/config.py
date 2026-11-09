@@ -23,11 +23,10 @@ class Settings(BaseSettings):
     # out of the box). Any PDFCABIN_DONATE_* env var overrides the corresponding
     # default, which keeps the "a fork collects donations for its own build"
     # pattern working without touching the code.
-    donate_btc: str = "183Ux9K4eNC8qxgULSN5eFcnvEiJGdzTBX"
-    donate_eth: str = "0xb8ec96ef15f6dc79f854c277c71acf6dc581f1ee"
-    donate_ton: str = ""
-    donate_usdt_bep20: str = "0x34aa51a6352c18cc5aacb4ef70ee8f5d968d1c4a"
-    donate_usdt_trc20: str = "TB8PSJu9SKncq2x7bsrqDS1sJTLWqoXCZA"
+    donate_btc: str = "bc1qw4my95y7uhmg7up7w762qfju04l6960plpkp0u"
+    donate_eth: str = "0x9a3e38ffa8d0002e8423a101b98ef214a574abde"
+    donate_ton: str = "UQBwZJojKzuIFCpf4V_RSVCSub4J96IWulnfeJ-hYRviB3nw"
+    donate_usdt_trc20: str = "TNGrTqLZZdf99zTQoSABvXmAzPTh7NfESk"
 
     @property
     def lang_list(self) -> list[str]:
@@ -38,9 +37,9 @@ class Settings(BaseSettings):
         addresses = []
         for network, address in (
             ("BTC", self.donate_btc),
-            ("ETH (ERC-20)", self.donate_eth),
+            ("Ethereum (ETH)", self.donate_eth),
+            ("USDT (ERC-20)", self.donate_eth),  # same chain address, labelled per asset
             ("TON", self.donate_ton),
-            ("USDT (BEP-20)", self.donate_usdt_bep20),
             ("USDT (TRC-20)", self.donate_usdt_trc20),
         ):
             if address.strip():
