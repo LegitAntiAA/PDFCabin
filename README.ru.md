@@ -163,8 +163,18 @@ claude mcp add --transport http pdfcabin http://localhost:8420/mcp --header "Aut
 
 ## Скриншоты
 
-<!-- TODO: screenshots/ui-main.png — главный экран: сетка файлов + дропзона -->
-<!-- TODO: screenshots/ui-ocr.png — прогресс OCR в панели задач -->
+![Главный экран — сетка файлов с бейджами](screenshots/ui-main.png)
+
+![Поиск по OCR-сканам с подсветкой совпадений](screenshots/ui-search.png)
+
+![OCR-задача в панели задач](screenshots/ui-ocr.png)
+
+![Модалка поддержки с крипто-адресами](screenshots/ui-donate.png)
+
+![Светлая тема](screenshots/ui-light.png)
+
+![Мобильная раскладка 380px](screenshots/ui-mobile.png)
+
 <!-- TODO: screenshots/mcp-demo.gif — аплоад → OCR → поиск из Claude через MCP -->
 
 ## Разработка

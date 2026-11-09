@@ -260,3 +260,23 @@ async def test_root_serves_static(client):
     response = await client.get("/")
     assert response.status_code == 200
     assert b"PDFCabin" in response.content
+
+
+async def test_parallel_thumbs_never_crash(client, make_pdf):
+    """Regression BUG-005: pdfium is not thread-safe; parallel thumbnail renders
+    (browser loads all cards at once) crashed with access violations -> 500."""
+    import asyncio
+
+    from app import config
+    from app.services import pdf_ops
+
+    make_pdf("par.pdf", pages=3)
+    pdf_ops.pdf_compress(config.docs_dir() / "par.pdf", config.docs_dir() / "par_c.pdf", "fast")
+
+    names = ["par.pdf", "par_c.pdf"] * 4
+    responses = await asyncio.gather(
+        *(client.get("/api/file/thumb", params={"path": name}) for name in names)
+    )
+    for response in responses:
+        assert response.status_code == 200, response.text[:200]
+        assert response.content[:4] == b"\x89PNG"

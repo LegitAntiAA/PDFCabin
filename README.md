@@ -163,8 +163,18 @@ Any other MCP client speaks the same JSON shape — point it at `http://localhos
 
 ## Screenshots
 
-<!-- TODO: screenshots/ui-main.png — main screen: file grid + drop zone -->
-<!-- TODO: screenshots/ui-ocr.png — OCR progress in the jobs drawer -->
+![Main screen — file grid with badges](screenshots/ui-main.png)
+
+![Search over OCR'd scans with highlighted matches](screenshots/ui-search.png)
+
+![OCR job in the tasks drawer](screenshots/ui-ocr.png)
+
+![Support modal with crypto addresses](screenshots/ui-donate.png)
+
+![Light theme](screenshots/ui-light.png)
+
+![Mobile layout at 380px](screenshots/ui-mobile.png)
+
 <!-- TODO: screenshots/mcp-demo.gif — upload → OCR → search from Claude via MCP -->
 
 ## Development

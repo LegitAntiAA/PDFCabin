@@ -161,9 +161,14 @@ def file_thumb(path: str, page: int = 1):
     try:
         if page < 1 or page > len(doc):
             raise HTTPException(status_code=400, detail=f"page out of range (1..{len(doc)})")
-        pdf_page = doc[page - 1]
-        scale = _THUMB_WIDTH / max(pdf_page.get_width(), 1.0)
-        image = pdf_page.render(scale=scale).to_pil()
+        with pdf_ops.PDFIUM_LOCK:  # pdfium is not thread-safe (BUG-005)
+            pdf_page = doc[page - 1]
+            scale = _THUMB_WIDTH / max(pdf_page.get_width(), 1.0)
+            image = pdf_page.render(scale=scale).to_pil()
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"cannot render page: {exc}") from exc
     finally:
         doc.close()
     buffer = io.BytesIO()

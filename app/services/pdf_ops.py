@@ -10,6 +10,7 @@ from __future__ import annotations
 import re
 import shutil
 import subprocess
+import threading
 from pathlib import Path
 
 import pikepdf
@@ -17,6 +18,11 @@ import pypdfium2 as pdfium
 
 PDF_MAGIC = b"%PDF-"
 _PAGES_RE = re.compile(r"(\d+)(?:\s*-\s*(\d*)\s*)?$")
+
+# PDFium is not thread-safe: concurrent FPDF_LoadPage calls crash with access
+# violations under parallel thumbnail requests (BUG-005). Every pdfium call
+# in the process must hold this lock.
+PDFIUM_LOCK = threading.Lock()
 
 
 class NotPdfError(ValueError):
@@ -265,24 +271,25 @@ def pdf_compress(path: Path, output: Path, level: str, overwrite: bool = False) 
 
 def extract_text(path: Path, pages: str | None = None) -> dict[int, str]:
     assert_is_pdf(path)
-    try:
-        doc = pdfium.PdfDocument(str(path))
-    except Exception as exc:
-        raise ValueError(f"cannot open PDF: {exc}") from exc
-    try:
-        total = len(doc)
-        wanted = parse_pages(pages, total) if pages else range(1, total + 1)
-        result: dict[int, str] = {}
-        for page_no in wanted:
-            page = doc[page_no - 1]
-            try:
-                text_page = page.get_textpage()
+    with PDFIUM_LOCK:  # pdfium calls are serialized process-wide (see PDFIUM_LOCK)
+        try:
+            doc = pdfium.PdfDocument(str(path))
+        except Exception as exc:
+            raise ValueError(f"cannot open PDF: {exc}") from exc
+        try:
+            total = len(doc)
+            wanted = parse_pages(pages, total) if pages else range(1, total + 1)
+            result: dict[int, str] = {}
+            for page_no in wanted:
+                page = doc[page_no - 1]
                 try:
-                    result[page_no] = text_page.get_text_range().strip()
+                    text_page = page.get_textpage()
+                    try:
+                        result[page_no] = text_page.get_text_range().strip()
+                    finally:
+                        text_page.close()
                 finally:
-                    text_page.close()
-            finally:
-                page.close()
-        return result
-    finally:
-        doc.close()
+                    page.close()
+            return result
+        finally:
+            doc.close()

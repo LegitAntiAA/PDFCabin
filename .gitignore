@@ -14,6 +14,4 @@ docs/*
 !docs/agent/
 *.db
 
-# Local artifacts
-screenshots/*.png
-screenshots/*.gif
+# Local artifacts (screenshots referenced by README are committed)

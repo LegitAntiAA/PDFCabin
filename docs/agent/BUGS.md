@@ -24,3 +24,10 @@
 - **Симптом:** 2 ERROR в test_health/test_upload_and_list: фикстура no_network вообще отсутствовала в conftest (потеряна при перезаписи файла Root'ом), тесты ссылались на несуществующую фикстуру.
 - **Фикс:** фикстура добавлена — патчит socket.create_connection и socket.getaddrinfo (C-метод socket.socket.connect непатчим в принципе, отражено в докстринге). Верификация: оба теста зелёные в составе fast-набора 53/0/4.
 - **Ограничение (задокументировано):** «сырые» socket().connect() фикстура не ловит; все высокоуровневые HTTP-клиенты проходят через два патченных входа — privacy-клейм охраняется на практике.
+
+## BUG-005 — VERIFIED FIXED (Root, найден приёмкой UI в браузере)
+- **Компонент:** pdfium/pypdfium2 через app/api.py (превью) и app/services/pdf_ops.py (extract_text)
+- **Симптом:** при живом браузере параллельные запросы превью карточек вызывали access violation внутри pdfium (FPDF_LoadPage, OSError reading 0xFFFFFFFFFFFFFFFF) → эпизодические 500 на /api/file/thumb (в логе 3 случая, в т.ч. на сжатых файлах); одно из падений уложило сервер.
+- **Root cause:** PDFium не потокобезопасен; FastAPI выполняет эндпоинты в threadpool — параллельные FPDF_LoadPage без синхронизации.
+- **Фикс:** глобальный `PDFIUM_LOCK` (threading.Lock) в pdf_ops, сериализующий все вызовы pdfium в процессе (превью + extract_text + индексация из OCR-джобы); плюс защита — ошибка рендера теперь 400 «cannot render page» вместо 500.
+- **Верификация:** регресс-тест test_parallel_thumbs_never_crash (8 параллельных превью сжатого PDF → все 200 PNG); fast-набор 54 passed / 0 failed; ruff чист; **подтверждено User Tester'ом в браузере после фикса: 11 карточек, ноль «Preview unavailable», ноль 500**.

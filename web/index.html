@@ -1,26 +1,153 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PDFCabin</title>
-<style>
-  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
-       font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
-       background:#17130F;color:#EDE6DA}
-  main{text-align:center;padding:2rem}
-  h1{color:#E8A33D;font-weight:600;margin:0 0 .5rem}
-  .tag{opacity:.9;margin:0 0 1.5rem}
-  p{opacity:.65;margin:.4rem 0}
-  code{background:#221C15;padding:.15rem .4rem;border-radius:6px}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="Your PDFs. Your server. Your rules. A private workspace for your documents.">
+  <title>PDFCabin — Your documents</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <script>
+    try {
+      document.documentElement.dataset.theme = localStorage.getItem('pdfcabin_theme') === 'light' ? 'light' : 'dark';
+    } catch (_) { /* Storage may be unavailable in a private or file session. */ }
+  </script>
+  <link rel="stylesheet" href="./style.css">
+  <script src="./app.js" defer></script>
 </head>
 <body>
-<main>
-  <h1>PDFCabin</h1>
-  <p class="tag">Your PDFs. Your server. Your rules.</p>
-  <p>The web UI is being built.</p>
-  <p>The REST API (<code>/api/health</code>) and the MCP server (<code>/mcp</code>) are already live.</p>
-</main>
+  <a class="skip-link" href="#main-content" data-i18n="skip">Skip to documents</a>
+  <header class="app-header">
+    <div class="header-inner">
+      <a class="brand" href="./index.html" aria-label="PDFCabin">
+        <img class="brand-mark" src="./logo.svg" alt="" width="36" height="36">
+        <span class="brand-name">PDF<span>Cabin</span></span>
+      </a>
+      <div class="header-tools">
+        <div class="search-container">
+          <label class="search-field" for="search-input">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+            <span class="sr-only" data-i18n="searchLabel">Search document text</span>
+            <input id="search-input" type="search" autocomplete="off" spellcheck="false" placeholder="Search document text…" data-i18n-placeholder="search" aria-controls="search-results">
+            <kbd class="search-shortcut" aria-hidden="true">/</kbd>
+          </label>
+          <div id="search-results" class="search-results" role="region" aria-label="Search results" data-i18n-label="searchResults" hidden></div>
+        </div>
+        <div class="header-controls">
+          <button id="lang-toggle" class="language-button" type="button" aria-label="Change language" data-i18n-label="language"><span>EN</span><svg class="icon icon-small" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m8 10 4 4 4-4"/></svg></button>
+          <button id="theme-toggle" class="icon-button" type="button" aria-label="Switch to light theme" data-i18n-label="theme"><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42m0-14.14-1.42 1.42M6.35 17.65l-1.42 1.42"/></svg></button>
+          <button id="token-button" class="icon-button" type="button" aria-label="Access token" data-i18n-label="token" hidden><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="8" cy="15" r="5"/><path d="m11.5 11.5 8-8L22 6l-2 2-2-2-2 2 2 2-3 3"/></svg></button>
+          <button id="donate-button" class="icon-button donate-button" type="button" aria-label="Support PDFCabin" data-i18n-label="donate" hidden><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="workspace" tabindex="-1">
+    <section class="workspace-intro" aria-labelledby="workspace-heading">
+      <div>
+        <h1 id="workspace-heading">Your PDFs. Your server. Your rules.</h1>
+        <p>Your documents stay on your infrastructure.</p>
+      </div>
+      <span class="intro-mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none"><path d="M9 34 32 15l23 19M15 31v23h34V31"/><path d="M27 35h11v19M44 18v7M22 41h-1m22 0h-1"/></svg></span>
+    </section>
+
+    <section class="upload-section" aria-label="Upload documents" data-i18n-label="uploadLabel">
+      <div id="dropzone" class="dropzone" tabindex="0" aria-label="Drop PDF files here, or press Enter to choose files" data-i18n-label="uploadLabel">
+        <div class="upload-illustration" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none"><path class="upload-page-back" d="M17 12h23l10 11v31H17z"/><path class="upload-page-front" d="M12 7h23l11 11v31H12z"/><path d="M35 7v11h11M22 28h14m-14 6h10"/><path class="upload-arrow" d="M45 57V39m-7 7 7-7 7 7"/></svg>
+        </div>
+        <div class="dropzone-copy">
+          <h2 data-i18n="dropTitle">Make room for your documents</h2>
+          <p data-i18n="dropHint">Drop PDFs here, or choose files from your device</p>
+        </div>
+        <button id="choose-files" class="button primary" type="button"><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 16V4m-5 5 5-5 5 5M4 16v4h16v-4"/></svg><span data-i18n="chooseFiles">Choose files</span></button>
+        <input id="file-input" type="file" multiple accept=".pdf,application/pdf" hidden>
+      </div>
+      <div id="upload-progress" class="upload-progress" role="status" hidden>
+        <div class="upload-progress-heading"><span id="upload-label" data-i18n="uploading">Uploading…</span><span id="upload-percent">0%</span></div>
+        <progress id="upload-meter" max="100" value="0" aria-label="Upload progress" data-i18n-label="uploadProgress"></progress>
+      </div>
+    </section>
+
+    <section class="library" aria-labelledby="library-title">
+      <div class="library-heading">
+        <div class="library-title-group"><h2 id="library-title" data-i18n="library">Your documents</h2><span id="file-count" class="file-count" aria-live="polite"></span></div>
+        <button id="refresh-button" class="icon-button" type="button" aria-label="Refresh documents" data-i18n-label="refresh"><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 7a7 7 0 0 1 11.55-1L20 9M4 15l2.35 3A7 7 0 0 0 17.9 17"/></svg></button>
+      </div>
+      <div class="library-toolbar">
+        <div class="library-filters">
+          <label class="select-all-control"><input id="select-all" type="checkbox" aria-label="Select all visible files" data-i18n-label="selectAll"><span data-i18n="selectAll">Select all</span></label>
+          <span class="toolbar-divider" aria-hidden="true"></span>
+          <div id="filter-tabs" class="filter-tabs" role="group" aria-label="Filter documents" data-i18n-label="filters">
+            <button class="filter-tab is-active" type="button" data-filter="all" aria-pressed="true" data-i18n="filterAll">All files</button>
+            <button class="filter-tab" type="button" data-filter="scanned" aria-pressed="false" data-i18n="filterScanned">Scanned</button>
+            <button class="filter-tab" type="button" data-filter="text" aria-pressed="false" data-i18n="filterText">With text</button>
+          </div>
+        </div>
+        <label class="sort-control" for="sort-select"><span data-i18n="sort">Sort by</span><select id="sort-select"><option value="recent" data-i18n="sortRecent">Most recent</option><option value="name" data-i18n="sortName">Name</option><option value="size" data-i18n="sortSize">File size</option></select></label>
+      </div>
+
+      <div id="connection-error" class="connection-error" role="alert" hidden>
+        <span class="error-symbol" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="m4 4 16 16M8.5 8.5a5 5 0 0 0-3.5 4.8M4.9 6.1a10 10 0 0 0-2.8 4M9 16a5 5 0 0 1 6 0M12 20h.01M8.2 3.7A10 10 0 0 1 22 10M14.2 9.2a5 5 0 0 1 4.8 4.1"/></svg></span>
+        <div><h3 data-i18n="offline">Cannot reach your server</h3><p id="error-message" data-i18n="offlineHint">Check that PDFCabin is running, then try again</p></div>
+        <button id="retry-button" class="button secondary" type="button" data-i18n="retry">Try again</button>
+      </div>
+
+      <div id="loading-state" class="loading-state" aria-busy="true" aria-label="Loading documents" data-i18n-label="loading">
+        <div class="skeleton-card" aria-hidden="true"><div></div><span></span><i></i></div>
+        <div class="skeleton-card" aria-hidden="true"><div></div><span></span><i></i></div>
+        <div class="skeleton-card" aria-hidden="true"><div></div><span></span><i></i></div>
+        <div class="skeleton-card" aria-hidden="true"><div></div><span></span><i></i></div>
+        <div class="skeleton-card" aria-hidden="true"><div></div><span></span><i></i></div>
+      </div>
+
+      <div id="file-grid" class="file-grid"></div>
+
+      <div id="empty-state" class="empty-state" hidden>
+        <svg class="empty-cabin" viewBox="0 0 200 156" fill="none" aria-hidden="true">
+          <path class="cabin-ground" d="M26 132h148M40 139h120"/>
+          <path class="cabin-roof" d="m29 79 63-49 63 49-8 10-55-42-55 42z"/>
+          <path class="cabin-wall" d="M41 84v48h102V84L92 45z"/>
+          <path class="cabin-lines" d="M49 93h28m-28 11h28m-28 11h28m29-22h29m-29 11h29m-29 11h29M83 88h20v44M57 67V39h15v17"/>
+          <path class="cabin-window" d="M111 79h20v23h-20zM121 79v23m-10-11h20"/>
+          <path class="cabin-paper" d="M131 47h29l15 15v54h-44z"/>
+          <path class="paper-lines" d="M160 47v15h15m-34 13h23m-23 9h23m-23 9h15"/>
+          
+        </svg>
+        <h3 data-i18n="emptyTitle">Drop PDFs here</h3>
+        <p data-i18n="emptyText">Your documents will feel at home here</p>
+        <p class="empty-hint" data-i18n="emptyHint">Merge, compress, and make scans searchable</p>
+      </div>
+    </section>
+  </main>
+
+  <section id="selection-bar" class="selection-bar" aria-label="Selected document actions" data-i18n-label="selectedActions" hidden>
+    <div class="selection-summary"><span class="selection-count-mark" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="m5 12 4 4L19 6"/></svg></span><span id="selection-count"></span><button id="clear-selection" class="icon-button" type="button" aria-label="Clear selection" data-i18n-label="clearSelection"><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg></button></div>
+    <span class="selection-divider" aria-hidden="true"></span>
+    <div class="selection-actions">
+      <button id="merge-button" class="button primary" type="button" disabled><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 3v4a6 6 0 0 0 6 6m6-10v4a6 6 0 0 1-6 6m0 0v8m-4-4 4 4 4-4"/></svg><span data-i18n="merge">Merge</span></button>
+      <button id="compress-button" class="button ghost" type="button"><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9h5V4m0 5L3 3m17 12h-5v5m0-5 6 6M15 4v5h5m-5 0 6-6M9 20v-5H4m5 0-6 6"/></svg><span data-i18n="compress">Compress</span></button>
+      <button id="ocr-button" class="button ghost" type="button"><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M7 8h10M12 8v9m-3 0h6"/></svg><span data-i18n="ocr">OCR</span></button>
+      <button id="delete-button" class="button ghost danger" type="button"><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/></svg><span data-i18n="delete">Delete</span></button>
+    </div>
+  </section>
+
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="server-meta"><span id="connection-status" class="connection-status" role="status" data-i18n="connection">Connecting…</span><span class="footer-dot" aria-hidden="true">·</span><span id="index-stats"></span></div>
+      <div class="footer-actions"><span id="version-label" class="version-label"></span><button id="jobs-toggle" class="jobs-toggle" type="button" aria-controls="jobs-drawer" aria-expanded="false"><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h8m5-3 3 3-3 3"/></svg><span data-i18n="jobs">Tasks</span><span id="jobs-count" class="jobs-count">0</span></button></div>
+    </div>
+  </footer>
+
+  <aside id="jobs-drawer" class="jobs-drawer" aria-labelledby="jobs-title" hidden>
+    <div class="drawer-header"><div><h2 id="jobs-title" data-i18n="jobsTitle">Document tasks</h2><p data-i18n="jobsHint">OCR runs while you keep working</p></div><button id="jobs-close" class="icon-button" type="button" aria-label="Close tasks" data-i18n-label="closeJobs"><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+    <div id="jobs-list" class="jobs-list"></div>
+  </aside>
+
+  <dialog id="modal" class="modal" aria-labelledby="modal-title"></dialog>
+  <dialog id="auth-modal" class="modal auth-modal" aria-labelledby="auth-title"></dialog>
+  <div id="toasts" class="toasts" aria-live="polite" aria-relevant="additions"></div>
+  <noscript><div class="noscript-message">PDFCabin needs JavaScript to work with your documents. Enable JavaScript and reload this page.</div></noscript>
 </body>
 </html>
